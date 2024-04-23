@@ -1,0 +1,66 @@
+#include <sys/types.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <string.h>
+
+const int size = 32;
+
+int main(int argc, char *argv[]) {
+    char input_path[] = "./input.txt";
+    char output_path[] = "./output.txt";
+    int fd;
+    char buffer[size];
+
+    // getting file names
+
+    printf("Hello, World!\n");
+    if (argc == 1) {
+        printf("Using default input = \"%s\" and output = \"%s\"\n", input_path, output_path);
+    } else if (argc == 3) {
+        strcpy(input_path, argv[1]);
+        strcpy(output_path, argv[2]);
+        printf("Using custom input = \"%s\" and output = \"%s\"\n", input_path, output_path);
+    } else {
+        printf("Incorrect number of arguments\n");
+        exit(-1);
+    }
+
+    // read file
+
+    ssize_t ssize;
+    if ((fd = open(input_path, O_RDONLY)) < 0) {
+        printf("Can\'t open file\n");
+        exit(-1);
+    }
+    do {
+        ssize = read(fd, buffer, size);
+        if (ssize == -1) {
+            printf("Can\'t write this file\n");
+            exit(-1);
+        }
+        buffer[ssize] = '\0';
+    } while (ssize == size);
+    if (close(fd) < 0) {
+        printf("Can\'t close file\n");
+    }
+
+    // write file
+
+    if ((fd = open(output_path, O_WRONLY | O_CREAT, 0666)) < 0) {
+        printf("Can\'t open this file\n");
+        exit(-1);
+    }
+    size_t length = strlen(buffer);
+    ssize = write(fd, buffer, length);
+    if (ssize != length) {
+        printf("Can\'t write all string");
+        exit(-1);
+    }
+    if (close(fd) < 0) {
+        printf("Can\'t close file");
+    }
+    return 0;
+}
